@@ -12,6 +12,7 @@
 #endif//The robot ID : It must be two char, such as '00','kl' or 'Cr'.
 char AI_MyID[2] = {'0','2'};
 
+
 int step=0;
 int count=0;
 int Duration = 0;
@@ -162,40 +163,52 @@ void Game0()
 
 
 }
+ int start_x=0;
+ int start_y=0;
+ int state=0;
+ int coord_x_diff=0;
+ int coord_y_diff=0;
+
+double wheel_speed=1.0;
 
 void Game1()
 {
-
-    if(SuperDuration>0)
-    {
-        SuperDuration--;
+    if(state==0){
+      WheelLeft=wheel_speed;// we will want to achieve a constant velocity first.
+      WheelRight=wheel_speed;
+      LED_1=0;
+      if(delay(500)==true){state=1;}
+      printf("moving at constant speed for 500ms\n");
     }
-    else if(Duration>0)
-    {
-        Duration--;
-    }
-    else if(true)
-    {
-        Duration = 0;
-        CurAction =1;
-    }
-    switch(CurAction)
-    {
-        case 1:
-            WheelLeft=1.55;
-            WheelRight=1.55;
-            LED_1=0;
-            MyState=0;
-            break;
-        default:
-            break;
-    }
-
+    else if (state==1){
+    WheelLeft=wheel_speed;
+    WheelRight=wheel_speed;
+    LED_1=0;
+    start_x= PositionX;//over here, we would want to store the initial coordinates
+    start_y= PositionY;
+    printf("stored starting position!\n");
+    state=2;
 }
+    else if(state==2){
+      WheelLeft=wheel_speed; //we will want to move forward for 1 second.
+      WheelRight=wheel_speed;
+      LED_1=0;
+      printf("moving at constant speed for 1000ms\n");
+      if(delay(1000)==true){state=3;}
 
-
-DLL_EXPORT void OnTimer()
-{
+    }
+    else if(state==3){
+      WheelLeft=0; //we will want to stop our wheels.
+      WheelRight=0;
+      LED_1=0;
+      coord_x_diff=PositionX-start_x;
+      coord_y_diff=PositionY-start_y;
+      printf("x difference: %d\n",coord_x_diff);
+      printf("y difference: %d\n",coord_y_diff);
+      state=4;
+    }
+}
+DLL_EXPORT void OnTimer(){
     switch (CurGame)
     {
         case 9:
