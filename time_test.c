@@ -1,28 +1,18 @@
-////////////////////////////////////////
-//
-//	File : ai.c
-//	CoSpace Robot
-//	Version 1.0.0
-//	Jan 1 2016
-//	Copyright (C) 2016 CoSpace Robot. All Rights Reserved
-//
-//////////////////////////////////////
-//
-// ONLY C Code can be compiled.
-//
-/////////////////////////////////////
-
+//time test program to enable the use of a custom delay function.
 #define CsBot_AI_H//DO NOT delete this line
 #ifndef CSBOT_REAL
 #include <windows.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #define DLL_EXPORT extern __declspec(dllexport)
 #define false 0
 #define true 1
 #endif//The robot ID : It must be two char, such as '00','kl' or 'Cr'.
 char AI_MyID[2] = {'0','2'};
 
+int step=0;
 int count=0;
 int Duration = 0;
 int SuperDuration = 0;
@@ -55,6 +45,9 @@ int MyState = 0;
 int AI_SensorNum = 13;
 
 #define CsBot_AI_C//DO NOT delete this line
+
+
+bool delay(int number_of_seconds);
 
 DLL_EXPORT void SetGameID(int GameID)
 {
@@ -143,34 +136,30 @@ DLL_EXPORT void GetCommand(int *AI_OUT)
     AI_OUT[1] = WheelRight;
     AI_OUT[2] = LED_1;
     AI_OUT[3] = MyState;
+
 }
+
+
+
+
 void Game0()
 {
+    if(step==0){
+    LED_1=1;
+    MyState=0;
+    WheelLeft=1.5;
+    WheelRight=1.5;
+   if(delay(1)==true){step=1;}
+    }
+    else if(step==1){
+      LED_1=2;
+      MyState=0;
+      WheelLeft=0;
+      WheelRight=0;
+     if(delay(2)==true){step=0;}
+    }
+    printf("Time: %d\n", Time);
 
-    if(SuperDuration>0)
-    {
-        SuperDuration--;
-    }
-    else if(Duration>0)
-    {
-        Duration--;
-    }
-    else if(true)
-    {
-        Duration = 0;
-        CurAction =1;
-    }
-    switch(CurAction)
-    {
-        case 1:
-            WheelLeft=1.5;
-            WheelRight=1.5;
-            LED_1=0;
-            MyState=0;
-            break;
-        default:
-            break;
-    }
 
 }
 
@@ -218,8 +207,9 @@ DLL_EXPORT void OnTimer()
             MyState=0;
             break;
         case 0:
-            printf("loop count: %d\n", count);
-            count++;
+          //test statements to determine call frequency.
+        //    printf("loop count: %d\n", count);
+          //  count++;
             Game0();
             break;
         case 1:
@@ -228,4 +218,38 @@ DLL_EXPORT void OnTimer()
         default:
             break;
     }
+}
+
+
+
+//returns true if delayed time has been reached.
+bool delay(int number_of_seconds)
+
+{
+
+	static int call_count=0;
+	static clock_t start_time;
+	// Converting time into milli_seconds
+
+	int milli_seconds = 1000 * number_of_seconds;
+
+	// Storing start time
+
+	if (call_count == 0) {
+		start_time = clock();
+		call_count = 1;
+		return false;
+	}
+
+	//if we have reached the desired wait duration, do this.
+	else if (call_count==1&&((clock() < start_time + milli_seconds)!=true)) {
+		//we have reached the desired time.
+		call_count = 0;
+		return true;
+
+	}
+
+	else {
+		return false;
+	}
 }
