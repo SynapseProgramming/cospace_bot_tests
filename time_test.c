@@ -149,14 +149,14 @@ void Game0()
     MyState=0;
     WheelLeft=1.5;
     WheelRight=1.5;
-   if(delay(1)==true){step=1;}
+   if(delay(1000)==true){step=1;}
     }
     else if(step==1){
       LED_1=2;
       MyState=0;
       WheelLeft=0;
       WheelRight=0;
-     if(delay(2)==true){step=0;}
+     if(delay(2000)==true){step=0;}
     }
     printf("Time: %d\n", Time);
 
@@ -223,7 +223,7 @@ DLL_EXPORT void OnTimer()
 
 
 //returns true if delayed time has been reached.
-bool delay(int number_of_seconds)
+bool delay(int milli_seconds)
 
 {
 
@@ -231,7 +231,6 @@ bool delay(int number_of_seconds)
 	static clock_t start_time;
 	// Converting time into milli_seconds
 
-	int milli_seconds = 1000 * number_of_seconds;
 
 	// Storing start time
 
