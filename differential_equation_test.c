@@ -177,12 +177,14 @@ void Game0()
 }
  int start_x=0;
  int start_y=0;
+ int start_theta=0;
  int state=0;
  int coord_x_diff=0;
  int coord_y_diff=0;
+ int theta_diff=0;
 
 //wheel speed in mm/s
-double linear_v=300;
+double linear_v=100;
 
 void Game1()
 {
@@ -215,6 +217,32 @@ void Game1()
       printf("x difference: %d\n",coord_x_diff);
       printf("y difference: %d\n",coord_y_diff);
       state=4;
+    }
+    else if (state==4){
+      compute_cospace_velocities(0, 200);
+      LED_1=0;
+      if(delay(500)==true){state=5;}
+      printf("turning at constant speed for 500ms\n");
+    }
+    else if (state==5){
+      compute_cospace_velocities(0, 200);
+      LED_1=0;
+      start_theta=Compass;
+      printf("stored starting position!\n");
+      state=6;
+    }
+    else if (state==6){
+      compute_cospace_velocities(0, 200);
+      LED_1=0;
+      printf("moving at constant speed for 1000ms\n");
+      if(delay(1000)==true){state=7;}
+    }
+    else if (state==7){
+      compute_cospace_velocities(0, 0);
+      LED_1=0;
+      theta_diff=start_theta-Compass;
+      printf("theta difference: %d\n",theta_diff);
+      state=8;
     }
 }
 DLL_EXPORT void OnTimer(){
