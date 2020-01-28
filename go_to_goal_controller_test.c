@@ -192,6 +192,7 @@ void Game1()
     printf("waypoint 1 reached!\n");
     count=1;
   }
+  // original 222,132
   if(count==1&&go_to_goal(222, 132,PositionX,PositionY,robot_heading)==true){
     printf("waypoint 2 reached\n");
     count=2;
@@ -357,6 +358,8 @@ bool go_to_goal(double goal_x, double goal_y,double robot_x,double robot_y,doubl
     //printf("angular control signal: %f\n",w_s);
   //  printf("linear control signal: %f\n", v_s);
   printf("distance to goal: %f\n", distance_to_goal);
+  //printf("robot_x: %f\n", robot_x);
+    //printf("robot_y: %f\n", robot_y);
 	//send speed commands here
   compute_cospace_velocities(v_s, w_s);
 	return goal_reached;
