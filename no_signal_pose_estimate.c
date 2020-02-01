@@ -207,11 +207,9 @@ void Game1()
   static int stat=0;
   robot_heading=Compass-270;
   if(robot_heading<-180){robot_heading=robot_heading+360;}
+  if(count<2){
   compute_reliable_pose();
-  //if(stat==0){init_odometry=true; stat=1;}
-  //pseudo_odometry(robot_heading);
-  //printf("current coordinates X: %d Y: %d\t Previous coords X: %d Y: %d\n ",PositionX,PositionY,previous_x_pose,previous_y_pose);
-
+}
   if(count==0&&go_to_goal(337, 98,pose_x,pose_y,robot_heading)==true){
     printf("waypoint 1 reached!\n");
     count=1;
