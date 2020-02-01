@@ -193,7 +193,7 @@ void Game1()
     count=1;
   }
   // original 222,132
-  if(count==1&&go_to_goal(222, 132,PositionX,PositionY,robot_heading)==true){
+  if(count==1&&go_to_goal(305, 114,PositionX,PositionY,robot_heading)==true){
     printf("waypoint 2 reached\n");
     count=2;
   }
