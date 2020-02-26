@@ -379,7 +379,7 @@ void print_path(graph_t *g, int i) {
 	//the path array stores the path information. first element is the source vertex. last element is the destination vertex.
 	for (n = 1, u = v; u->dist; u = g->vertices[u->prev], n++);
 	int *path = (int*)malloc(n * sizeof(int));
-	if (path == NULL) { printf("MEMORY NOT ALLOCATED. ERROR.\N"); }
+	if (path == NULL) { printf("MEMORY NOT ALLOCATED. ERROR.\n"); }
 	printf("value of n: %d\n",n);
 	path[n-1] = i;
 	//this line populates the path array with path info
