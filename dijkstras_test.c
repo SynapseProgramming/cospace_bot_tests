@@ -68,12 +68,12 @@ graph_t *g;
 const  int obstacle_cost = 1000;
 const  int freespace_cost = 1;
 // absolute map width(x) and height(y) values. not 0 based
-# define MAP_WIDTH 4
-# define MAP_HEIGHT 3
+# define MAP_WIDTH 40
+# define MAP_HEIGHT 20
 
 
 //cost array. false=free space. true=obstacle
-bool cost_array[12] = { false,true,false,false,false,true,false,false,false,false,false,false };
+bool cost_array[800] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 int main() {
@@ -81,7 +81,7 @@ int main() {
 
 
 	//after this, path_to_goal will be populated with the 1-d indexes of the coordinates from the start location, to the end location
-	compute_shortest_path(0,0,1,2);
+	compute_shortest_path(0, 0, 30, 18);
 
 	getch();
 	return 0;
@@ -126,7 +126,7 @@ void map_visualiser() {
 		map[p_x][p_y] = '@';
 	}
 
-	 //lastly, we will print out the elements in the map
+	//lastly, we will print out the elements in the map
 	for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
 		for (int x = 0; x < MAP_WIDTH; x++) {
 			printf("%c ", map[x][y]);
@@ -237,16 +237,15 @@ void init_graph(graph_t *g) {
 }
 
 
-void compute_shortest_path(int start_x, int start_y,int goal_x, int goal_y) {
+void compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y) {
 	//compute 1-d index of start and goal given xy coord
 	int source = start_x + (MAP_WIDTH*start_y);
 	int destination = goal_x + (MAP_WIDTH*goal_y);
-
-
 	static bool init = false;
 	if (init == false) {
 		//init g pointer
-		g = calloc(1, sizeof(graph_t));
+		//printf("%d\n", sizeof(graph_t));
+		g = calloc(1, sizeof(heap_t));
 		//init graph
 		generate_grid(g);
 		init = true;
@@ -391,8 +390,8 @@ void print_path(graph_t *g, int i) {
 	//u->dist refers to the total cost of the path
 	//the path array stores the path information. first element is the source vertex. last element is the destination vertex.
 	for (n = 1, u = v; u->dist; u = g->vertices[u->prev], n++);
-	char *path = malloc(n);
-	path[n - 1] = i;
+	int *path = malloc(n);
+	path[n-1] = i;
 	//this line populates the path array with path info
 	for (j = 0, u = v; u->dist; u = g->vertices[u->prev], j++) {
 		path[n - j - 2] = u->prev;
