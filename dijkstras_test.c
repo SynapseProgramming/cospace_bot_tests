@@ -54,8 +54,10 @@ void init_graph(graph_t *g);
 void compute_shortest_path(int source, int destination);
 //function which generates a grid representation of the world, given a 1-d cost array generated from a map
 void generate_grid(graph_t *g);
+//map visualiser would print out the map in the command window
+void map_visualiser();
 
-//VARIABLES HERE
+//VARIABLES FOR DIJKSTRAS HERE
 //array of chars which contains the shortest path from source vertex to destination vertex
 int path_to_goal[300];
 // integer which indicates the number of vertices in the shortest path
@@ -64,8 +66,12 @@ int path_length = 0;
 graph_t *g;
 
 
+# define MAP_WIDTH 4
+# define MAP_HEIGHT 3
+
+
 //cost array. false=free space. true=obstacle
-bool cost_array[12] = { false,true,false,false,false,true,true,false,false,false,false,false };
+bool cost_array[12] = { false,true,false,false,false,true,false,false,false,false,false,false };
 
 
 int main() {
@@ -86,6 +92,56 @@ int main() {
 	return 0;
 }
 
+void map_visualiser() {
+	// @ represents the generated path
+	// # represents the obstacle
+	// . represents free space
+	char map[MAP_WIDTH][MAP_HEIGHT];
+
+	//firstly, we will fill up all elements as free space
+	for (int y = 0; y < MAP_HEIGHT; y++) {
+		for (int x = 0; x < MAP_WIDTH; x++) {
+			map[x][y] = '.';
+
+		}// bracket of x loop
+
+	}// bracket of y loop
+
+	 //Next, we will fill up the map with obstacles
+	for (int y = 0; y < MAP_HEIGHT; y++) {
+		for (int x = 0; x < MAP_WIDTH; x++) {
+			//Firstly, we will look up the index given current x and y
+			int i = x + MAP_WIDTH*y;
+			//if its a obstacle, change the element to a #. else do nothing
+			if (cost_array[i] == true) { map[x][y] = '#'; }
+
+		}// bracket of x loop
+
+	}// bracket of y loop
+
+	 //next, we will fill up the map with the generated path.
+	for (int i = 0; i < path_length; i++) {
+		//firstly, we will obtain the index of the path vertex
+		int p_index = path_to_goal[i];
+		//next, we will obtain the corresponding x and y coord of the path
+		int p_x = p_index%MAP_WIDTH;
+		int p_y = p_index / MAP_WIDTH;
+		printf("%d %d\n", p_x, p_y);
+		//we would want to update the map with the path info
+		map[p_x][p_y] = '@';
+	}
+
+	 //lastly, we will print out the elements in the map
+	for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
+		for (int x = 0; x < MAP_WIDTH; x++) {
+			printf("%c ", map[x][y]);
+
+		}//bracket of x loop
+		printf("\n");
+	}//bracket of y loop
+
+}
+
 
 void generate_grid(graph_t *g) {
 	//map height and map width are not base 0. height(y-direction) width(x-direction)
@@ -97,27 +153,27 @@ void generate_grid(graph_t *g) {
 	//generate grid
 	for (int y = 0; y < map_height; y++) {
 		for (int x = 0; x < map_width; x++) {
-		//Firstly, we would compute the current 1-d index given the current xy coords
+			//Firstly, we would compute the current 1-d index given the current xy coords
 			int curr_index = x + (map_width*y);
 			//if the current vertex is an obstacle vertex, set all edges to neighbouring verticies as obstacles
-			if(cost_array[curr_index]==true){
-			//compute edge to right neighbouring vertex
-				if ((x + 1) < map_width ) {
-				//add_edge(g, curr_index, curr_index+1,obstacle_cost);
+			if (cost_array[curr_index] == true) {
+				//compute edge to right neighbouring vertex
+				if ((x + 1) < map_width) {
+					//add_edge(g, curr_index, curr_index+1,obstacle_cost);
 				}
-			//compute edge to left neighbouring vertex
+				//compute edge to left neighbouring vertex
 				if ((x - 1) >= 0) {
 					//add_edge(g, curr_index, curr_index - 1, obstacle_cost);
 				}
-			//compute edge to top neighbouring vertex
+				//compute edge to top neighbouring vertex
 				if ((y + 1) < map_height) {
-				//we will compute index of top neighbouring vertex
+					//we will compute index of top neighbouring vertex
 					int top_index = x + (map_width*(y + 1));
 					add_edge(g, curr_index, top_index, obstacle_cost);
 
 				}
 				//compute edge to bottom neighbouring vertex
-				if ((y - 1) >=0) {
+				if ((y - 1) >= 0) {
 					//we will compute index of bottom neighbouring vertex
 					int bottom_index = x + (map_width*(y - 1));
 					add_edge(g, curr_index, bottom_index, obstacle_cost);
@@ -125,19 +181,19 @@ void generate_grid(graph_t *g) {
 				}
 			}//bracket of obstacle true
 
-			//if the current vertex is not an obstacle, then we examine the neighbouring vertex costs, and determine if the edges are free or not
+			 //if the current vertex is not an obstacle, then we examine the neighbouring vertex costs, and determine if the edges are free or not
 			if (cost_array[curr_index] == false) {
 				//compute edge to right neighbouring vertex
 				if ((x + 1) < map_width) {
 					//if the right neighbouring vertex is also free , then set a free cost
-					if (cost_array[curr_index + 1] == false) { add_edge(g, curr_index, curr_index+1, freespace_cost); }
+					if (cost_array[curr_index + 1] == false) { add_edge(g, curr_index, curr_index + 1, freespace_cost); }
 					else { add_edge(g, curr_index, curr_index + 1, obstacle_cost); }
 
 				}
 				//compute edge to left neighbouring vertex
 				if ((x - 1) >= 0) {
 					//if the left neighbouring vertex is also free , then set a free cost
-					if (cost_array[curr_index -1 ] == false) { add_edge(g, curr_index, curr_index - 1, freespace_cost); }
+					if (cost_array[curr_index - 1] == false) { add_edge(g, curr_index, curr_index - 1, freespace_cost); }
 					else { add_edge(g, curr_index, curr_index - 1, obstacle_cost); }
 
 				}
@@ -203,6 +259,8 @@ void compute_shortest_path(int source, int destination) {
 	print_path(g, destination);
 	//print_ptg for debugging purposes.
 	print_ptg();
+	//visualise the map for debugging purposes.
+	map_visualiser();
 
 }
 
@@ -339,7 +397,7 @@ void print_path(graph_t *g, int i) {
 	path[n - 1] = i;
 	//this line populates the path array with path info
 	for (j = 0, u = v; u->dist; u = g->vertices[u->prev], j++) {
-		path[n - j - 2] =  u->prev;
+		path[n - j - 2] = u->prev;
 	}
 	//this line, the path array has been populated.
 	for (int i = 0; i < n; i++) {
