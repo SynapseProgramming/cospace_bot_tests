@@ -56,8 +56,8 @@ int previous_x_pose=0;
 int previous_y_pose=0;
 
 //reliable poses.
-double pose_x=0;
-double pose_y=0;
+int pose_x=0;
+int pose_y=0;
 
 //pose estimates by odometry.
 double estimated_x=0;
@@ -109,7 +109,8 @@ double wheel_displacements(int motor_units);
 void pseudo_odometry(double current_heading);
 //function which enables a stable pose to be read. stable poses are pose_x and pose_y
 void compute_reliable_pose();
-
+// function which enables the robot to move from its current position to the goal location using dijkstras algorithm. returns true if the goal is reached.
+bool navigate_to_point(int goal_x, int goal_y);
 
 //FUNCTIONS FOR DIJKSTRAS HERE
 void add_vertex(graph_t *g, int i);
@@ -127,14 +128,14 @@ void generate_undirected_edge(graph_t *g, int source, int destination, int weigh
 //function which prints out the contents of the path_to_goal array
 void print_ptg();
 //high level function which returns shortest path given source vertex and destination vertex. updates path_to_goal and path_length variables
-void compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y);
+bool compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y);
 //function which generates a grid representation of the world, given a 1-d cost array generated from a map
 void generate_grid(graph_t *g);
 //map visualiser would print out the map in the command window
 void map_visualiser();
 
 //VARIABLES FOR DIJKSTRAS HERE
-//array of chars which contains the shortest path from source vertex to destination vertex
+//array of ints which contains the shortest path from source vertex to destination vertex
 int path_to_goal[1000];
 // integer which indicates the number of vertices in the shortest path
 int path_length = 0;
@@ -279,6 +280,7 @@ void Game1()
   static int stat=0;
   robot_heading=Compass-270;
   if(robot_heading<-180){robot_heading=robot_heading+360;}
+  compute_reliable_pose();
 /*(
   if(count<2){
   compute_reliable_pose();
@@ -295,8 +297,13 @@ void Game1()
   }
 */
 if(count==0){
-compute_shortest_path(169, 10, 17, 80);
-count++;
+//296, 128
+if(navigate_to_point(296, 128)==true){count=1;}
+}
+if(count==1){
+
+if(navigate_to_point(102, 20)==true){count=2;}
+
 }
 previous_x_pose=PositionX;
 previous_y_pose=PositionY;
@@ -322,6 +329,49 @@ DLL_EXPORT void OnTimer(){
             break;
     }
 }
+
+//this functio would be the main function used for navigation
+bool navigate_to_point(int goal_x, int goal_y){
+static int nav_step=0;
+//waypoint dist is the desired distance between the robot and the intermediate waypoint
+static int waypoint_dist=15;
+
+//firstly,convert goal coords and the robots coordinates to dijkstras coordinates by divide.
+int dijk_goal_x=goal_x/2;
+int dijk_goal_y=goal_y/2;
+int dijk_robot_x=pose_x/2;
+int dijk_robot_y=pose_y/2;
+static int path_index=0;
+//Next, we will compute the shortest path from the robots current pose to the goal location
+if(nav_step==0){
+if(compute_shortest_path(dijk_robot_x,dijk_robot_y,dijk_goal_x,dijk_goal_y)==true){nav_step=1;}
+printf("path found!\n Following path\n");
+}
+//next, we will enable the robot to follow the path
+if(nav_step==1){
+//convert from 1-d goal representation to 2d xy in world coordinates
+int world_path_x=(path_to_goal[path_index]%MAP_WIDTH)*2;
+int world_path_y=(path_to_goal[path_index]/MAP_WIDTH)*2;
+//compute absolute distance between the bot and the intermediate goal
+double x_diff=world_path_x-pose_x;
+double y_diff=world_path_y-pose_y;
+int path_bot_dist=sqrt(pow(x_diff, 2) + pow(y_diff, 2));
+//printf("bot dist: %d\n",path_bot_dist);
+//if we have reached the last waypoint and if go to goal has reached the final point, we have successfully reached the pose.
+if(go_to_goal(world_path_x,world_path_y,pose_x,pose_y,robot_heading)==true&&(path_index==path_length-1)){
+  printf("final point reached.\n");
+  path_index=0;nav_step=0;
+  return true;
+}
+//if we have not reached the last waypoint, then we shall iterate onto the next path waypoint
+else if(path_index!=path_length-1&&path_bot_dist<=waypoint_dist){path_index++;}
+return false;
+//printf("wpx: %d wpy: %d\n",world_path_x,world_path_y);
+}
+
+
+}
+
 
 //returns true if delayed time has been reached.
 bool delay(int milli_seconds){
@@ -415,7 +465,7 @@ bool go_to_goal(double goal_x, double goal_y,double robot_x,double robot_y,doubl
   	//proportional gain
   	static const double Kp = 3.0;
   	//distance to goal where the robot would start to slow down
-  	static double goal_speed_threshold = 20;
+  	static double goal_speed_threshold = 7;
 
 
   	//angular control signal (deg/s)
@@ -524,7 +574,7 @@ void compute_reliable_pose(){
     //update reliable pose variables.
     pose_x=estimated_x;
     pose_y=estimated_y;
-    printf("no server pose. using odom pose estimate X: %f Y: %f\n", pose_x,pose_y);
+  //  printf("no server pose. using odom pose estimate X: %f Y: %f\n", pose_x,pose_y);
     //when signal is back, exit odom pose estimate.
     if(PositionX!=0&&PositionY!=0){state=0;}
 
@@ -532,7 +582,7 @@ void compute_reliable_pose(){
 
   // if theres no missing coordinates, just take the existing pose values provided by the server.
   if(PositionX!=0&&PositionY!=0){
-  printf("using server pose X: %f Y: %f\n", pose_x,pose_y);
+//  printf("using server pose X: %f Y: %f\n", pose_x,pose_y);
   pose_x=PositionX;
   pose_y=PositionY;
   }
@@ -679,7 +729,7 @@ void print_ptg() {
 }
 
 
-void compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y) {
+bool compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y) {
 	//compute 1-d index of start and goal given xy coord
 	int source = start_x + (MAP_WIDTH*start_y);
 	int destination = goal_x + (MAP_WIDTH*goal_y);
@@ -700,7 +750,7 @@ void compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y) {
 	//print_ptg();
 	//visualise the map for debugging purposes.
 	map_visualiser();
-
+  return true;
 }
 
 void generate_undirected_edge(graph_t *g, int source, int destination, int weight) {
@@ -832,7 +882,8 @@ void print_path(graph_t *g, int i) {
 	//u->dist refers to the total cost of the path
 	//the path array stores the path information. first element is the source vertex. last element is the destination vertex.
 	for (n = 1, u = v; u->dist; u = g->vertices[u->prev], n++);
-	int *path = malloc(n);
+	int *path = (int*)malloc(n * sizeof(int));
+	if (path == NULL) { printf("MEMORY NOT ALLOCATED. ERROR.\n"); }
 	path[n-1] = i;
 	//this line populates the path array with path info
 	for (j = 0, u = v; u->dist; u = g->vertices[u->prev], j++) {
