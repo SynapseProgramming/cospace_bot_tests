@@ -51,7 +51,7 @@ void print_ptg();
 //initialize the graph. this is a test function
 void init_graph(graph_t *g);
 //high level function which returns shortest path given source vertex and destination vertex. updates path_to_goal and path_length variables
-void compute_shortest_path(int source, int destination);
+void compute_shortest_path(int start_x, int start_y, int goal_x, int goal_y);
 //function which generates a grid representation of the world, given a 1-d cost array generated from a map
 void generate_grid(graph_t *g);
 //map visualiser would print out the map in the command window
@@ -59,13 +59,15 @@ void map_visualiser();
 
 //VARIABLES FOR DIJKSTRAS HERE
 //array of chars which contains the shortest path from source vertex to destination vertex
-int path_to_goal[300];
+int path_to_goal[500];
 // integer which indicates the number of vertices in the shortest path
 int path_length = 0;
 //global graph g
 graph_t *g;
-
-
+//costs for obstacle and free space
+const  int obstacle_cost = 1000;
+const  int freespace_cost = 1;
+// absolute map width(x) and height(y) values. not 0 based
 # define MAP_WIDTH 4
 # define MAP_HEIGHT 3
 
@@ -76,17 +78,10 @@ bool cost_array[12] = { false,true,false,false,false,true,false,false,false,fals
 
 int main() {
 
-	/* ok
 
-	compute_shortest_path('a', 'e');
-	compute_shortest_path('a', 'c');
-	*/
-	/*
-	for (int i = 0; i < 100; i++) {
-	printf("%d\n", cost_array[i]);
-	}
-	*/
-	compute_shortest_path(0, 2);
+
+	//after this, path_to_goal will be populated with the 1-d indexes of the coordinates from the start location, to the end location
+	compute_shortest_path(0,0,1,2);
 
 	getch();
 	return 0;
@@ -145,10 +140,8 @@ void map_visualiser() {
 
 void generate_grid(graph_t *g) {
 	//map height and map width are not base 0. height(y-direction) width(x-direction)
-	const static int map_height = 3;
-	const static int map_width = 4;
-	const static int obstacle_cost = 1000;
-	const static int freespace_cost = 1;
+	const static int map_height = MAP_HEIGHT;
+	const static int map_width = MAP_WIDTH;
 
 	//generate grid
 	for (int y = 0; y < map_height; y++) {
@@ -244,7 +237,12 @@ void init_graph(graph_t *g) {
 }
 
 
-void compute_shortest_path(int source, int destination) {
+void compute_shortest_path(int start_x, int start_y,int goal_x, int goal_y) {
+	//compute 1-d index of start and goal given xy coord
+	int source = start_x + (MAP_WIDTH*start_y);
+	int destination = goal_x + (MAP_WIDTH*goal_y);
+
+
 	static bool init = false;
 	if (init == false) {
 		//init g pointer
@@ -258,7 +256,7 @@ void compute_shortest_path(int source, int destination) {
 	//compute path
 	print_path(g, destination);
 	//print_ptg for debugging purposes.
-	print_ptg();
+	//print_ptg();
 	//visualise the map for debugging purposes.
 	map_visualiser();
 
